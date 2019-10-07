@@ -10,6 +10,8 @@ width = 40
 height = 60
 vel = 5
 
+is_jump = False
+jump_count = 10
 run = True
 
 while run:
@@ -19,14 +21,24 @@ while run:
             run = False
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
+    if keys[pygame.K_LEFT] and x > vel:
         x -= vel
-    if keys[pygame.K_RIGHT]:
+    if keys[pygame.K_RIGHT] and x < 500 - vel - width:
         x += vel
-    if keys[pygame.K_UP]:
-        y -= vel
-    if keys[pygame.K_DOWN]:
-        y += vel
+    if not is_jump:
+        if keys[pygame.K_UP] and y > vel:
+            y -= vel
+        if keys[pygame.K_DOWN] and y < 500 - height - vel:
+            y += vel
+        if keys[pygame.K_SPACE]:
+            is_jump = True
+    else:
+        if jump_count >= -10:
+            y -= (jump_count * abs(jump_count)) * 0.5
+            jump_count -= 1
+        else:
+            jump_count = 10
+            is_jump = False
 
     win.fill((0, 0, 0))
     pygame.draw.rect(win, (255, 0, 0), (x, y, width, height))
