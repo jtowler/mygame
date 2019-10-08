@@ -11,10 +11,8 @@ def load(s):
     return pygame.image.load(f"{resource_dir}{s}")
 
 
-walk_right = [load('R1.png'), load('R2.png'), load('R3.png'), load('R4.png'), load('R5.png'), load('R6.png'),
-              load('R7.png'), load('R8.png'), load('R9.png')]
-walk_left = [load('L1.png'), load('L2.png'), load('L3.png'), load('L4.png'), load('L5.png'), load('L6.png'),
-             load('L7.png'), load('L8.png'), load('L9.png')]
+walk_right = [load(f'R{i}.png') for i in range(1, 10)]
+walk_left = [load(f'L{i}.png') for i in range(1, 10)]
 bg = load('bg.jpg')
 character = load('standing.png')
 
@@ -66,15 +64,57 @@ class Player(object):
                 w.blit(walk_left[0], (self.x, self.y))
 
 
+class Enemy(object):
+    walk_right = [load(f'R{i}E.png') for i in range(1, 12)]
+    walk_left = [load(f'L{i}E.png') for i in range(1, 12)]
+
+    def __init__(self, x, y, width, height, end):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.path = [x, end]
+        self.walk_count = 0
+        self.vel = 3
+
+    def draw(self, win):
+        self.move()
+        if self.walk_count + 1 >= 33:
+            self.walk_count = 0
+        if self.vel > 0:
+            win.blit(self.walk_right[self.walk_count // 3], (self.x, self.y))
+        else:
+            win.blit(self.walk_left[self.walk_count // 3], (self.x, self.y))
+        self.walk_count += 1
+
+    def move(self):
+        if self.vel > 0:
+            if self.x < self.path[1] + self.vel:
+                self.x += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.x += self.vel
+                self.walk_count = 0
+        else:
+            if self.x > self.path[0] - self.vel:
+                self.x += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.x += self.vel
+                self.walk_count = 0
+
+
 def redraw_game_window():
     win.blit(bg, (0, 0))
     man.draw(win)
+    goblin.draw(win)
     for bullet in bullets:
         bullet.draw(win)
     pygame.display.update()
 
 
 man = Player(200, 410, 64, 64)
+goblin = Enemy(100, 410, 64, 64, 300)
 run = True
 
 bullets = []
