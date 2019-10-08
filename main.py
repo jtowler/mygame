@@ -73,6 +73,8 @@ class Player(object):
         self.hitbox = (self.x + 17, self.y + 11, 29, 52)
 
     def hit(self):
+        self.is_jump = False
+        self.jump_count = 10
         self.x = 60
         self.y = 410
         self.walk_count = 0
