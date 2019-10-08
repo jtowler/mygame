@@ -1,5 +1,4 @@
 import pygame
-
 pygame.init()
 
 win = pygame.display.set_mode((500, 480))
@@ -19,6 +18,12 @@ character = load('standing.png')
 
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("helvetica", 30)
+
+bullet_sound = pygame.mixer.Sound(f"{resource_dir}bullet.ogg")
+hit_sound = pygame.mixer.Sound(f"{resource_dir}hit.ogg")
+
+music = pygame.mixer.music.load(f"{resource_dir}music.mp3")
+pygame.mixer.music.play(-1)
 
 
 class Projectile(object):
@@ -66,6 +71,23 @@ class Player(object):
             else:
                 w.blit(walk_left[0], (self.x, self.y))
         self.hitbox = (self.x + 17, self.y + 11, 29, 52)
+
+    def hit(self):
+        self.x = 60
+        self.y = 410
+        self.walk_count = 0
+        font1 = pygame.font.SysFont('helvetica', 100)
+        text = font1.render('-5', 1, (255, 0, 0))
+        win.blit(text, (250 - (text.get_width() / 2), 200))
+        pygame.display.update()
+        i = 0
+        while i < 300:
+            pygame.time.delay(10)
+            i += 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    i = 301
+                    pygame.quit()
 
 
 class Enemy(object):
@@ -115,6 +137,7 @@ class Enemy(object):
                 self.walk_count = 0
 
     def hit(self):
+        hit_sound.play()
         if self.health:
             self.health -= 1
         else:
@@ -141,6 +164,14 @@ bullets = []
 
 while run:
     clock.tick(27)
+
+    if (goblin.visible and
+            man.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and
+            man.hitbox[1] + man.hitbox[3] > goblin.hitbox[1] and
+            man.hitbox[0] + man.hitbox[2] > goblin.hitbox[0] and
+            man.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]):
+        man.hit()
+        score -= 5
 
     if shoot_loop > 0:
         shoot_loop += 1
@@ -169,6 +200,7 @@ while run:
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_SPACE] and shoot_loop == 0:
+        bullet_sound.play()
         if man.left:
             facing = -1
         else:
