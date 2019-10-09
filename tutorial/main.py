@@ -1,10 +1,11 @@
 import pygame
+
 pygame.init()
 
 win = pygame.display.set_mode((500, 480))
 pygame.display.set_caption("First Game")
 
-resource_dir = "resources/"
+resource_dir = "tutorial/resources/"
 
 
 def load(s):
@@ -91,6 +92,13 @@ class Player(object):
                     i = 301
                     pygame.quit()
 
+    def is_hit(self, enemy: 'Enemy') -> bool:
+        return (enemy.visible and
+                self.hitbox[1] < enemy.hitbox[1] + enemy.hitbox[3] and
+                self.hitbox[1] + self.hitbox[3] > enemy.hitbox[1] and
+                self.hitbox[0] + self.hitbox[2] > enemy.hitbox[0] and
+                self.hitbox[0] < enemy.hitbox[0] + enemy.hitbox[2])
+
 
 class Enemy(object):
     walk_right = [load(f'R{i}E.png') for i in range(1, 12)]
@@ -145,6 +153,13 @@ class Enemy(object):
         else:
             self.visible = False
 
+    def is_hit(self, bullet: 'Projectile') -> bool:
+        return (self.visible and
+                bullet.y - bullet.radius < self.hitbox[1] + self.hitbox[3] and
+                bullet.y + bullet.radius > self.hitbox[1] and
+                bullet.x + bullet.radius > self.hitbox[0] and
+                bullet.x - bullet.radius < self.hitbox[0] + self.hitbox[2])
+
 
 def redraw_game_window():
     win.blit(bg, (0, 0))
@@ -167,11 +182,7 @@ bullets = []
 while run:
     clock.tick(27)
 
-    if (goblin.visible and
-            man.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and
-            man.hitbox[1] + man.hitbox[3] > goblin.hitbox[1] and
-            man.hitbox[0] + man.hitbox[2] > goblin.hitbox[0] and
-            man.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]):
+    if man.is_hit(goblin):
         man.hit()
         score -= 5
 
@@ -185,11 +196,7 @@ while run:
             run = False
 
     for bullet in bullets:
-        if (goblin.visible and
-                bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and
-                bullet.y + bullet.radius > goblin.hitbox[1] and
-                bullet.x + bullet.radius > goblin.hitbox[0] and
-                bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]):
+        if goblin.is_hit(bullet):
             goblin.hit()
             score += 1
             bullets.pop(bullets.index(bullet))
