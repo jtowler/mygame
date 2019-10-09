@@ -12,8 +12,6 @@ def load(s):
     return pygame.image.load(f"{resource_dir}{s}")
 
 
-walk_right = [load(f'R{i}.png') for i in range(1, 10)]
-walk_left = [load(f'L{i}.png') for i in range(1, 10)]
 bg = load('bg.jpg')
 character = load('standing.png')
 
@@ -41,7 +39,10 @@ class Projectile(object):
 
 
 class Player(object):
-    def __init__(self, x, y, width, height):
+    walk_right = [load(f'R{i}.png') for i in range(1, 10)]
+    walk_left = [load(f'L{i}.png') for i in range(1, 10)]
+
+    def __init__(self, x: int, y: int, width: int, height: int) -> None:
         self.x = x
         self.y = y
         self.width = width
@@ -61,16 +62,16 @@ class Player(object):
 
         if not self.standing:
             if self.left:
-                w.blit(walk_left[self.walk_count // 3], (self.x, self.y))
+                w.blit(self.walk_left[self.walk_count // 3], (self.x, self.y))
                 self.walk_count += 1
             elif self.right:
-                w.blit(walk_right[self.walk_count // 3], (self.x, self.y))
+                w.blit(self.walk_right[self.walk_count // 3], (self.x, self.y))
                 self.walk_count += 1
         else:
             if self.right:
-                w.blit(walk_right[0], (self.x, self.y))
+                w.blit(self.walk_right[0], (self.x, self.y))
             else:
-                w.blit(walk_left[0], (self.x, self.y))
+                w.blit(self.walk_left[0], (self.x, self.y))
         self.hitbox = (self.x + 17, self.y + 11, 29, 52)
 
     def hit(self):
@@ -104,7 +105,7 @@ class Enemy(object):
     walk_right = [load(f'R{i}E.png') for i in range(1, 12)]
     walk_left = [load(f'L{i}E.png') for i in range(1, 12)]
 
-    def __init__(self, x, y, width, height, end):
+    def __init__(self, x: int, y: int, width: int, height: int, end: int) -> None:
         self.x = x
         self.y = y
         self.width = width
