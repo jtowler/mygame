@@ -38,20 +38,25 @@ class Projectile(object):
         pygame.draw.circle(w, self.color, (self.x, self.y), self.radius)
 
 
-class Player(object):
-    walk_right = [load(f'R{i}.png') for i in range(1, 10)]
-    walk_left = [load(f'L{i}.png') for i in range(1, 10)]
-
-    def __init__(self, x: int, y: int, width: int, height: int) -> None:
+class Entity(object):
+    def __init__(self, x: int, y: int, width: int, height: int, vel: int) -> None:
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 5
+        self.vel = vel
+        self.walk_count = 0
+
+
+class Player(Entity):
+    walk_right = [load(f'R{i}.png') for i in range(1, 10)]
+    walk_left = [load(f'L{i}.png') for i in range(1, 10)]
+
+    def __init__(self, x: int, y: int, width: int, height: int) -> None:
+        super().__init__(x, y, width, height, 5)
         self.is_jump = False
         self.left = False
         self.right = False
-        self.walk_count = 0
         self.jump_count = 10
         self.standing = True
         self.hitbox = (self.x + 17, self.y + 11, 29, 52)
@@ -101,18 +106,13 @@ class Player(object):
                 self.hitbox[0] < enemy.hitbox[0] + enemy.hitbox[2])
 
 
-class Enemy(object):
+class Enemy(Entity):
     walk_right = [load(f'R{i}E.png') for i in range(1, 12)]
     walk_left = [load(f'L{i}E.png') for i in range(1, 12)]
 
     def __init__(self, x: int, y: int, width: int, height: int, end: int) -> None:
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+        super().__init__(x, y, width, height, 3)
         self.path = [x, end]
-        self.walk_count = 0
-        self.vel = 3
         self.hitbox = (self.x + 17, self.y + 2, 31, 57)
         self.health = 10
         self.visible = True
