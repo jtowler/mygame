@@ -27,9 +27,9 @@ def create_grid(locked_positions=None):
 
 def convert_shape_format(shape):
     positions = []
-    format = shape.shape[shape.rotation % len(shape.shape)]
+    fmt = shape.shape[shape.rotation % len(shape.shape)]
 
-    for i, line in enumerate(format):
+    for i, line in enumerate(fmt):
         row = list(line)
         for j, column in enumerate(row):
             if column == '0':
@@ -47,10 +47,8 @@ def valid_space(shape, grid):
     formatted = convert_shape_format(shape)
 
     for pos in formatted:
-        if pos not in accepted_positions:
-            if pos[1] > -1:
-                return False
-
+        if pos not in accepted_positions and pos[1] > -1:
+            return False
     return True
 
 
@@ -73,12 +71,12 @@ def draw_text_middle(surface, text, size, color):
 
 
 def draw_grid(surface, row, col):
-    sx = top_left_x
-    sy = top_left_y
     for i in range(row):
-        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * 30), (sx + play_width, sy + i * 30))
+        pygame.draw.line(surface, (128, 128, 128), (top_left_x, top_left_y + i * 30),
+                         (top_left_x + play_width, top_left_y + i * 30))
     for j in range(col):
-        pygame.draw.line(surface, (128, 128, 128), (sx + j * 30, sy), (sx + j * 30, sy + play_height))
+        pygame.draw.line(surface, (128, 128, 128), (top_left_x + j * 30, top_left_y),
+                         (top_left_x + j * 30, top_left_y + play_height))
 
 
 def clear_rows(grid, locked):
@@ -94,7 +92,7 @@ def clear_rows(grid, locked):
                 except:
                     continue
     if inc > 0:
-        for key in sorted(list(locked), key=lambda x: x[1])[::-1]:
+        for key in sorted(list(locked), key=lambda l: l[1], reverse=True):
             x, y = key
             if y < ind:
                 new_key = (x, y + inc)
@@ -109,9 +107,9 @@ def draw_next_shape(shape, surface):
 
     sx = top_left_x + play_width + 50
     sy = top_left_y + play_height / 2 - 100
-    format = shape.shape[shape.rotation % len(shape.shape)]
+    fmt = shape.shape[shape.rotation % len(shape.shape)]
 
-    for i, line in enumerate(format):
+    for i, line in enumerate(fmt):
         row = list(line)
         for j, column in enumerate(row):
             if column == '0':
@@ -151,8 +149,8 @@ def draw_window(surface, grid, score=0, last_score=0):
     pygame.display.update()
 
 
-def main(win):
-    global grid
+def main(w):
+    # global grid
 
     score = 0
     last_score = max_score()
@@ -228,12 +226,12 @@ def main(win):
 
             score += clear_rows(grid, locked_positions) * 10
 
-        draw_window(win, grid, score, last_score)
-        draw_next_shape(next_piece, win)
+        draw_window(w, grid, score, last_score)
+        draw_next_shape(next_piece, w)
         pygame.display.update()
 
         if check_lost(locked_positions):
-            draw_text_middle(win, "YOU LOST!", 80, (255, 255, 255))
+            draw_text_middle(w, "YOU LOST!", 80, (255, 255, 255))
             pygame.display.update()
             pygame.time.delay(1500)
             run = False
@@ -257,17 +255,17 @@ def max_score():
     return score
 
 
-def main_menu(win):
+def main_menu(w):
     run = True
     while run:
-        win.fill((0, 0, 0))
-        draw_text_middle(win, 'Press Any Key To Play', 60, (255, 255, 255))
+        w.fill((0, 0, 0))
+        draw_text_middle(w, 'Press Any Key To Play', 60, (255, 255, 255))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
-                main(win)
+                main(w)
 
 
 win = pygame.display.set_mode((s_width, s_height))
