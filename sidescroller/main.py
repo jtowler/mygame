@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from pygame.locals import *
 import os
@@ -20,6 +22,35 @@ bg_x = 0
 bg_x2 = bg.get_width()
 
 clock = pygame.time.Clock()
+
+
+class Saw(object):
+    rotate = [load(f'SAW{i}.png') for i in range(0, 4)]
+
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.rotate_count = 0
+        self.vel = 1.4
+        self.hitbox = (self.x + 10, self.y + 5, self.width - 20, self.height - 5)
+
+    def draw(self, win):
+        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
+        if self.rotate_count >= 8:
+            self.rotate_count = 0
+        win.blit(pygame.transform.scale(self.rotate[self.rotate_count // 2], (64, 64)), (self.x, self.y))
+        self. rotate_count += 1
+
+
+class Spike(Saw):
+    img = load('spike.png')
+
+    def draw(self, win):
+        self.hitbox = (self.x + 10, self.y, 28, 315)
+        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
+        win.blit(self.img, (self.x, self.y))
 
 
 class Player(object):
@@ -76,16 +107,26 @@ def redraw_window():
     win.blit(bg, (bg_x, 0))
     win.blit(bg, (bg_x2, 0))
     runner.draw(win)
+    for obstacle in obstacles:
+        obstacle.draw(win)
     pygame.display.update()
 
 
 run = True
 speed = 30
 pygame.time.set_timer(USEREVENT + 1, 500)
+pygame.time.set_timer(USEREVENT + 2, random.randrange(2000, 3500))
 runner = Player(200, 313, 64, 64)
+obstacles = []
 
 while run:
     redraw_window()
+
+    for obstacle in obstacles:
+        obstacle.x -= 1.4
+        if obstacle.x < obstacle.width * -1:
+            obstacles.pop(obstacles.index(obstacle))
+
     bg_x -= 1.4
     bg_x2 -= 1.4
 
@@ -101,6 +142,12 @@ while run:
             quit()
         if event.type == USEREVENT + 1:
             speed += 1
+        if event.type == USEREVENT + 2:
+            r = random.randrange(0, 2)
+            if r == 0:
+                obstacles.append(Saw(810, 310, 64, 64))
+            elif r == 1:
+                obstacles.append(Spike(810, 0, 48, 310))
 
     keys = pygame.key.get_pressed()
 
