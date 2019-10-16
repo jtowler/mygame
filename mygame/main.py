@@ -39,15 +39,16 @@ while run:
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_LEFT]:
+    if keys[pygame.K_LEFT] and x > 0:
         x -= 5
-    elif keys[pygame.K_RIGHT]:
+    elif keys[pygame.K_RIGHT] and x < bg_x2:
         x += 5
-    elif keys[pygame.K_UP]:
+    elif keys[pygame.K_UP] and y > 0:
         y -= 5
-    elif keys[pygame.K_DOWN]:
+    elif keys[pygame.K_DOWN] and y < bg_y2:
         y += 5
 
     win.fill((0, 0, 0))
     win.blit(bg, (x - width / 2, y - height / 2))
+    print(width / 2 - x, height / 2 - y)
     pygame.display.update()
