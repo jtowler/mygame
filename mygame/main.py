@@ -22,10 +22,8 @@ bg_x = 0
 bg_y = 0
 bg_x2 = bg.get_width()
 bg_y2 = bg.get_height()
-x = bg_x2 / 2
-y = bg_y2 / 2
-
-print(bg_x2, bg_y2)
+x = bg_x2 // 2
+y = bg_y2 // 2
 
 run = True
 while run:
@@ -49,6 +47,6 @@ while run:
         y += 5
 
     win.fill((0, 0, 0))
-    win.blit(bg, (x - width / 2, y - height / 2))
-    print(width / 2 - x, height / 2 - y)
+    win.blit(bg, (width / 2 - x, height / 2 - y))
+    pygame.draw.circle(win, (255, 0, 0), (width // 2, height // 2), 10)
     pygame.display.update()
