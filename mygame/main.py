@@ -1,4 +1,5 @@
 import pygame
+import math
 import os
 
 pygame.init()
@@ -37,14 +38,23 @@ while run:
 
     keys = pygame.key.get_pressed()
 
+    hori = 0
+    vert = 0
     if keys[pygame.K_LEFT] and x > 0:
-        x -= 5
-    elif keys[pygame.K_RIGHT] and x < bg_x2:
-        x += 5
-    elif keys[pygame.K_UP] and y > 0:
-        y -= 5
-    elif keys[pygame.K_DOWN] and y < bg_y2:
-        y += 5
+        hori -= 5
+    if keys[pygame.K_RIGHT] and x < bg_x2:
+        hori += 5
+    if keys[pygame.K_UP] and y > 0:
+        vert -= 5
+    if keys[pygame.K_DOWN] and y < bg_y2:
+        vert += 5
+
+    if hori and vert:
+        hori = hori / math.sqrt(2)
+        vert = vert / math.sqrt(3)
+
+    x += hori
+    y += vert
 
     win.fill((0, 0, 0))
     win.blit(bg, (width / 2 - x, height / 2 - y))
