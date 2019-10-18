@@ -9,6 +9,13 @@ def load(fn: str):
     return pygame.image.load(os.path.join('resources', fn))
 
 
+def get_angle(m_x, m_y, w, h, r):
+    theta = math.atan2(m_y - h / 2, m_x - w / 2)
+    r_x = r * math.cos(theta)
+    r_y = r * math.sin(theta)
+    return r_x, r_y
+
+
 width = 300
 height = 300
 
@@ -56,7 +63,10 @@ while run:
     x += hori
     y += vert
 
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    r_x, r_y = get_angle(mouse_x, mouse_y, width, height, 20)
     win.fill((0, 0, 0))
     win.blit(bg, (width / 2 - x, height / 2 - y))
     pygame.draw.circle(win, (255, 0, 0), (width // 2, height // 2), 10)
+    pygame.draw.line(win, (255, 0, 0), (width // 2, height // 2), (r_x + width // 2, r_y + height // 2), 4)
     pygame.display.update()
