@@ -1,6 +1,6 @@
 import pygame
 import random
-from tetris.blocks import shapes, Piece
+from src.tetris import shapes, Piece
 
 pygame.font.init()
 
