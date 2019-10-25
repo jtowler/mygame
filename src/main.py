@@ -1,45 +1,14 @@
 import pygame
 import math
 import os
-
-
-class Projectile(object):
-
-    def __init__(self, x: int, y: int, theta: float):
-        self.x = x
-        self.y = y
-        self.theta = theta
-        self.v = 5
-
-    def move(self):
-        r_x, r_y = get_projections(self.v, self.theta)
-        self.x += int(r_x)
-        self.y += int(r_y)
-
-    def draw(self, win):
-        pass
-
+from utilities.geometry import get_angle, project
+from projectile import Projectile
 
 pygame.init()
 
 
 def load(fn: str):
     return pygame.image.load(os.path.join('resources', fn))
-
-
-def get_angle(x, y, w, h):
-    return math.atan2(y - h / 2, x - w / 2)
-
-
-def get_projections(r, theta):
-    r_x = r * math.cos(theta)
-    r_y = r * math.sin(theta)
-    return int(r_x), int(r_y)
-
-
-def project(m_x, m_y, w, h, r):
-    theta = get_angle(m_x, m_y, w, h)
-    return get_projections(r, theta)
 
 
 width = 300
@@ -89,8 +58,8 @@ def main():
             vert += 5
 
         if hori and vert:
-            hori = hori / math.sqrt(2)
-            vert = vert / math.sqrt(2)
+            hori = int(hori / math.sqrt(2))
+            vert = int(vert / math.sqrt(2))
 
         x += hori
         y += vert
@@ -115,7 +84,7 @@ def main():
         pygame.draw.circle(win, (255, 0, 0), (w2, h2), 10)
         pygame.draw.line(win, (255, 0, 0), (w2, h2), (rw, rh), 4)
         for projectile in projectiles:
-            print(w2, h2, projectile.x, projectile.y)
+            print(w2, h2, projectile.x, projectile.y, x, y)
             pygame.draw.circle(win, (255, 255, 255), (w2 - projectile.x - x, h2 - projectile.y - y), 1)
             projectile.move()
         pygame.display.update()
