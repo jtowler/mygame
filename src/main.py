@@ -1,8 +1,10 @@
+import random
+
 import pygame
 import math
 import os
 from utilities.geometry import get_angle, project
-from projectile import Projectile
+from entity import Projectile, Enemy
 
 pygame.init()
 
@@ -29,6 +31,8 @@ def main():
     bg_y = bg.get_height()
     x = bg_x // 2
     y = bg_y // 2
+
+    enemies = [Enemy(random.randrange(0, width), random.randrange(0, height))]
 
     projectiles = []
     projectile_tick = 0
@@ -83,7 +87,7 @@ def main():
         win.blit(bg, (w2 - x, h2 - y))
         pygame.draw.circle(win, (255, 0, 0), (w2, h2), 10)
         pygame.draw.line(win, (255, 0, 0), (w2, h2), (rw, rh), 4)
-        print(len(projectiles))
+
         for projectile in projectiles:
             a_x = projectile.x - x
             a_y = projectile.y - y
@@ -91,6 +95,13 @@ def main():
             projectile.move()
             if abs(a_x) > width or abs(a_y) > height:
                 projectiles.remove(projectile)
+
+        for enemy in enemies:
+            a_x = enemy.x - x
+            a_y = enemy.y - y
+            pygame.draw.circle(win, (0, 255, 0), (w2 + a_x, h2 + a_y), 10)
+            enemy.move()
+
         pygame.display.update()
 
 
