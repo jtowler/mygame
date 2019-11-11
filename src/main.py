@@ -83,10 +83,14 @@ def main():
         win.blit(bg, (w2 - x, h2 - y))
         pygame.draw.circle(win, (255, 0, 0), (w2, h2), 10)
         pygame.draw.line(win, (255, 0, 0), (w2, h2), (rw, rh), 4)
+        print(len(projectiles))
         for projectile in projectiles:
-            print(w2, h2, projectile.x, projectile.y, x, y)
-            pygame.draw.circle(win, (255, 255, 255), (w2 + (projectile.x - x), h2 + (projectile.y - y)), 1)
+            a_x = projectile.x - x
+            a_y = projectile.y - y
+            pygame.draw.circle(win, (255, 255, 255), (w2 + a_x, h2 + a_y), 1)
             projectile.move()
+            if abs(a_x) > width or abs(a_y) > height:
+                projectiles.remove(projectile)
         pygame.display.update()
 
 
