@@ -72,7 +72,7 @@ def main():
 
         if projectile_tick == 0:
             if pygame.mouse.get_pressed()[0]:
-                projectiles.append(Projectile(rw, rh, theta))
+                projectiles.append(Projectile(x + r_x, y + r_y, theta))
                 projectile_tick = 1
         elif projectile_tick < projectile_cooldown:
             projectile_tick += 1
@@ -85,7 +85,7 @@ def main():
         pygame.draw.line(win, (255, 0, 0), (w2, h2), (rw, rh), 4)
         for projectile in projectiles:
             print(w2, h2, projectile.x, projectile.y, x, y)
-            pygame.draw.circle(win, (255, 255, 255), (w2 - projectile.x - x, h2 - projectile.y - y), 1)
+            pygame.draw.circle(win, (255, 255, 255), (w2 + (projectile.x - x), h2 + (projectile.y - y)), 1)
             projectile.move()
         pygame.display.update()
 
