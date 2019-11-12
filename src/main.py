@@ -32,7 +32,7 @@ def main():
     x = bg_x // 2
     y = bg_y // 2
 
-    enemies = [Enemy(random.randrange(0, width), random.randrange(0, height))]
+    enemies = [Enemy(random.randrange(0, width), random.randrange(0, height), 10)]
 
     projectiles = []
     projectile_tick = 0
@@ -76,7 +76,7 @@ def main():
 
         if projectile_tick == 0:
             if pygame.mouse.get_pressed()[0]:
-                projectiles.append(Projectile(x + r_x, y + r_y, theta))
+                projectiles.append(Projectile(x + r_x, y + r_y, theta, 1))
                 projectile_tick = 1
         elif projectile_tick < projectile_cooldown:
             projectile_tick += 1
@@ -91,15 +91,21 @@ def main():
         for projectile in projectiles:
             a_x = projectile.x - x
             a_y = projectile.y - y
-            pygame.draw.circle(win, (255, 255, 255), (w2 + a_x, h2 + a_y), 1)
+            pygame.draw.circle(win, (255, 255, 255), (w2 + a_x, h2 + a_y), projectile.radius)
             projectile.move()
             if abs(a_x) > width or abs(a_y) > height:
                 projectiles.remove(projectile)
+            for enemy in enemies:
+                if enemy.is_hit(projectile):
+                    projectiles.remove(projectile)
+                    enemy.hit()
 
         for enemy in enemies:
+            if enemy.is_dead():
+                enemies.remove(enemy)
             a_x = enemy.x - x
             a_y = enemy.y - y
-            pygame.draw.circle(win, (0, 255, 0), (w2 + a_x, h2 + a_y), 10)
+            pygame.draw.circle(win, (0, 255, 0), (w2 + a_x, h2 + a_y), enemy.radius)
             enemy.move()
 
         pygame.display.update()
