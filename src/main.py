@@ -91,7 +91,7 @@ def main():
         for projectile in projectiles:
             a_x = projectile.x - x
             a_y = projectile.y - y
-            pygame.draw.circle(win, (255, 255, 255), (w2 + a_x, h2 + a_y), projectile.radius)
+            projectile.draw(win, w2 + a_x, h2 + a_y)
             projectile.move()
             if abs(a_x) > width or abs(a_y) > height:
                 projectiles.remove(projectile)
@@ -105,7 +105,7 @@ def main():
                 enemies.remove(enemy)
             a_x = enemy.x - x
             a_y = enemy.y - y
-            pygame.draw.circle(win, (0, 255, 0), (w2 + a_x, h2 + a_y), enemy.radius)
+            enemy.draw(win, w2 + a_x, h2 + a_y)
             enemy.move()
 
         pygame.display.update()

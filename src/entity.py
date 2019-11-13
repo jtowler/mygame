@@ -1,27 +1,31 @@
 import math
 import random
+import pygame
 
 from utilities.geometry import get_projections
 
 
 class Projectile(object):
 
-    def __init__(self, x: int, y: int, theta: float, radius: int):
+    def __init__(self, x: int, y: int, theta: float, radius: int) -> None:
         self.x = x
         self.y = y
         self.theta = theta
         self.radius = radius
         self.v = 8
 
-    def move(self):
+    def move(self) -> None:
         r_x, r_y = get_projections(self.v, self.theta)
         self.x += int(r_x)
         self.y += int(r_y)
 
+    def draw(self, win, x, y):
+        pygame.draw.circle(win, (255, 255, 255), (x, y), self.radius)
+
 
 class Enemy(object):
 
-    def __init__(self, x: int, y: int, radius: int):
+    def __init__(self, x: int, y: int, radius: int) -> None:
         self.x = x
         self.y = y
         self.radius = radius
@@ -29,7 +33,7 @@ class Enemy(object):
         self.v = 3
         self.hits = 5
 
-    def move(self):
+    def move(self) -> None:
         r = random.random()
         if r < 0.2:
             self.theta += 1
@@ -54,3 +58,6 @@ class Enemy(object):
 
     def is_dead(self) -> bool:
         return self.hits <= 0
+
+    def draw(self, win, x, y) -> None:
+        pygame.draw.circle(win, (0, 255, 0), (x, y), self.radius)
