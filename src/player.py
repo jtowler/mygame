@@ -4,7 +4,7 @@ import pygame
 
 class Player(object):
 
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
 
@@ -28,3 +28,6 @@ class Player(object):
 
         self.x += hori
         self.y += vert
+
+    def draw(self, win, mid_x, mid_y) -> None:
+        pygame.draw.circle(win, (255, 0, 0), (mid_x, mid_y), 10)

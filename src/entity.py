@@ -2,6 +2,7 @@ import math
 import random
 import pygame
 
+from player import Player
 from utilities.geometry import get_projections
 
 
@@ -19,8 +20,15 @@ class Projectile(object):
         self.x += int(r_x)
         self.y += int(r_y)
 
-    def draw(self, win, x, y):
-        pygame.draw.circle(win, (255, 255, 255), (x, y), self.radius)
+    def draw(self, win, player: Player, mid_x, mid_y):
+        a_x = self.x - player.x
+        a_y = self.y - player.y
+        pygame.draw.circle(win, (255, 255, 255), (mid_x + a_x, mid_y + a_y), self.radius)
+
+    def is_offscreen(self, player: Player, width: int, height: int) -> bool:
+        a_x = self.x - player.x
+        a_y = self.y - player.y
+        return abs(a_x) > width or abs(a_y) > height
 
 
 class Enemy(object):
@@ -59,5 +67,12 @@ class Enemy(object):
     def is_dead(self) -> bool:
         return self.hits <= 0
 
-    def draw(self, win, x, y) -> None:
-        pygame.draw.circle(win, (0, 255, 0), (x, y), self.radius)
+    def draw(self, win, player: Player, mid_x: int, mid_y: int) -> None:
+        a_x = self.x - player.x
+        a_y = self.y - player.y
+        pygame.draw.circle(win, (0, 255, 0), (mid_x + a_x, mid_y + a_y), self.radius)
+
+    def is_offscreen(self, player: Player, width: int, height: int) -> bool:
+        a_x = self.x - player.x
+        a_y = self.y - player.y
+        return abs(a_x) > width or abs(a_y) > height
