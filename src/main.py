@@ -1,10 +1,10 @@
 import random
 
 import pygame
-import math
 import os
+
 from utilities.geometry import get_angle, project
-from entity import Projectile, Enemy
+from entity import Player, Enemy
 
 pygame.init()
 
@@ -29,8 +29,8 @@ bg = load('test_bg.png').convert()
 def main():
     bg_x = bg.get_width()
     bg_y = bg.get_height()
-    x = bg_x // 2
-    y = bg_y // 2
+
+    player = Player(bg_x // 2, bg_y // 2)
 
     enemies = [Enemy(random.randrange(0, width), random.randrange(0, height), 10)]
 
@@ -48,35 +48,11 @@ def main():
                 run = False
                 pygame.quit()
 
-        keys = pygame.key.get_pressed()
-
-        hori = 0
-        vert = 0
-        if keys[pygame.K_a] and x > 0:
-            hori -= 5
-        if keys[pygame.K_d] and x < bg_x:
-            hori += 5
-        if keys[pygame.K_w] and y > 0:
-            vert -= 5
-        if keys[pygame.K_s] and y < bg_y:
-            vert += 5
-
-        if hori and vert:
-            hori = int(hori / math.sqrt(2))
-            vert = int(vert / math.sqrt(2))
-
-        x += hori
-        y += vert
-
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        r_x, r_y = project(mouse_x, mouse_y, width, height, 20)
-        rw = r_x + w2
-        rh = r_y + h2
-        theta = get_angle(mouse_x, mouse_y, width, height)
+        player.move(bg_x, bg_y, width, height)
 
         if projectile_tick == 0:
             if pygame.mouse.get_pressed()[0]:
-                projectiles.append(Projectile(x + r_x, y + r_y, theta, 1))
+                projectiles.append(player.shoot(w2, h2))
                 projectile_tick = 1
         elif projectile_tick < projectile_cooldown:
             projectile_tick += 1
@@ -84,29 +60,24 @@ def main():
             projectile_tick = 0
 
         win.fill((0, 0, 0))
-        win.blit(bg, (w2 - x, h2 - y))
-        pygame.draw.circle(win, (255, 0, 0), (w2, h2), 10)
-        pygame.draw.line(win, (255, 0, 0), (w2, h2), (rw, rh), 4)
+        win.blit(bg, (w2 - player.x, h2 - player.y))
+        player.draw(win, w2, h2)
 
         for projectile in projectiles:
-            a_x = projectile.x - x
-            a_y = projectile.y - y
-            projectile.draw(win, w2 + a_x, h2 + a_y)
+            projectile.draw(win, player, w2, h2)
             projectile.move()
-            if abs(a_x) > width or abs(a_y) > height:
+            if projectile.is_offscreen(player, width, height):
                 projectiles.remove(projectile)
             for enemy in enemies:
                 if enemy.is_hit(projectile):
                     projectiles.remove(projectile)
                     enemy.hit()
+                    if enemy.is_dead():
+                        enemies.remove(enemy)
 
         for enemy in enemies:
-            if enemy.is_dead():
-                enemies.remove(enemy)
-            a_x = enemy.x - x
-            a_y = enemy.y - y
-            enemy.draw(win, w2 + a_x, h2 + a_y)
             enemy.move()
+            enemy.draw(win, player, w2, h2)
 
         pygame.display.update()
 
