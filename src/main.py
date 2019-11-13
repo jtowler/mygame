@@ -1,12 +1,10 @@
 import random
 
 import pygame
-import math
 import os
 
-from player import Player
 from utilities.geometry import get_angle, project
-from entity import Projectile, Enemy
+from entity import Player, Enemy
 
 pygame.init()
 
@@ -31,8 +29,6 @@ bg = load('test_bg.png').convert()
 def main():
     bg_x = bg.get_width()
     bg_y = bg.get_height()
-    # x = bg_x // 2
-    # y = bg_y // 2
 
     player = Player(bg_x // 2, bg_y // 2)
 
@@ -52,17 +48,11 @@ def main():
                 run = False
                 pygame.quit()
 
-        player.move(bg_x, bg_y)
-
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        r_x, r_y = project(mouse_x, mouse_y, width, height, 20)
-        rw = r_x + w2
-        rh = r_y + h2
-        theta = get_angle(mouse_x, mouse_y, width, height)
+        player.move(bg_x, bg_y, width, height)
 
         if projectile_tick == 0:
             if pygame.mouse.get_pressed()[0]:
-                projectiles.append(Projectile(player.x + r_x, player.y + r_y, theta, 1))
+                projectiles.append(player.shoot(w2, h2))
                 projectile_tick = 1
         elif projectile_tick < projectile_cooldown:
             projectile_tick += 1
@@ -72,7 +62,6 @@ def main():
         win.fill((0, 0, 0))
         win.blit(bg, (w2 - player.x, h2 - player.y))
         player.draw(win, w2, h2)
-        pygame.draw.line(win, (255, 0, 0), (w2, h2), (rw, rh), 4)
 
         for projectile in projectiles:
             projectile.draw(win, player, w2, h2)
@@ -83,12 +72,12 @@ def main():
                 if enemy.is_hit(projectile):
                     projectiles.remove(projectile)
                     enemy.hit()
+                    if enemy.is_dead():
+                        enemies.remove(enemy)
 
         for enemy in enemies:
-            if enemy.is_dead():
-                enemies.remove(enemy)
-            enemy.draw(win, player, w2, h2)
             enemy.move()
+            enemy.draw(win, player, w2, h2)
 
         pygame.display.update()
 
