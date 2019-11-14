@@ -57,7 +57,7 @@ class Player(Entity):
         self.gun.draw(win, this, mid_x, mid_y)
 
     def shoot(self, w2: int, h2: int):
-        return Projectile(self.x + self.gun.x - w2, self.y + self.gun.y - h2, self.gun.theta, 1)
+        return self.gun.shoot(self.x, self.y, w2, h2)
 
 
 class Projectile(Entity):
@@ -124,3 +124,6 @@ class Gun(Entity):
 
     def draw(self, win, that: Entity, mid_x: int, mid_y: int) -> None:
         pygame.draw.line(win, (255, 0, 0), (mid_x, mid_y), (self.x, self.y), 4)
+
+    def shoot(self, x: int, y: int, w2: int, h2: int):
+        return Projectile(self.x + x - w2, self.y + y - h2, self.theta, 1)
