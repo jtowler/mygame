@@ -47,7 +47,6 @@ def main():
                 pygame.quit()
 
         player.move(bg_x, bg_y, width, height)
-
         if projectile_tick == 0:
             if pygame.mouse.get_pressed()[0]:
                 projectiles.append(player.shoot(w2, h2))

@@ -27,7 +27,7 @@ class Player(Entity):
 
     def __init__(self, x: int, y: int) -> None:
         super().__init__(x, y, 10, (255, 0, 0))
-        self.gun = Bazooka()
+        self.gun = Pistol()
 
     def move(self, max_x: int, max_y: int, width: int, height: int) -> None:
         keys = pygame.key.get_pressed()
@@ -42,6 +42,10 @@ class Player(Entity):
             vert -= 5
         if keys[pygame.K_s] and self.y < max_y:
             vert += 5
+        if keys[pygame.K_1]:
+            self.gun = Pistol()
+        if keys[pygame.K_2]:
+            self.gun = Bazooka()
 
         if hori and vert:
             hori = int(hori / math.sqrt(2))
