@@ -1,14 +1,32 @@
 import random
 import pygame
+from typing import Tuple
 
 from utilities.geometry import *
 
 
-class Player(object):
-
-    def __init__(self, x: int, y: int) -> None:
+class Entity(object):
+    def __init__(self, x: int, y: int, radius: int, colour: Tuple[int, int, int]) -> None:
         self.x = x
         self.y = y
+        self.radius = radius
+        self.colour = colour
+
+    def draw(self, win, that: 'Entity', mid_x: int, mid_y: int) -> None:
+        a_x = self.x - that.x
+        a_y = self.y - that.y
+        pygame.draw.circle(win, self.colour, (mid_x + a_x, mid_y + a_y), self.radius)
+
+    def is_offscreen(self, entity: 'Entity', width: int, height: int) -> bool:
+        a_x = self.x - entity.x
+        a_y = self.y - entity.y
+        return abs(a_x) > width or abs(a_y) > height
+
+
+class Player(Entity):
+
+    def __init__(self, x: int, y: int) -> None:
+        super().__init__(x, y, 10, (255, 0, 0))
         self.gun = Gun()
 
     def move(self, max_x: int, max_y: int, width: int, height: int) -> None:
@@ -34,21 +52,19 @@ class Player(object):
 
         self.gun.update_position(width, height)
 
-    def draw(self, win, mid_x, mid_y) -> None:
-        pygame.draw.circle(win, (255, 0, 0), (mid_x, mid_y), 10)
-        self.gun.draw(win, mid_x, mid_y)
+    def draw(self, win, this, mid_x, mid_y) -> None:
+        super().draw(win, this, mid_x, mid_y)
+        self.gun.draw(win, this, mid_x, mid_y)
 
     def shoot(self, w2: int, h2: int):
-        return Projectile(self.x + self.gun.x - w2, self.y + self.gun.y - h2, self.gun.theta, 1)
+        return self.gun.shoot(self.x, self.y, w2, h2)
 
 
-class Projectile(object):
+class Projectile(Entity):
 
     def __init__(self, x: int, y: int, theta: float, radius: int) -> None:
-        self.x = x
-        self.y = y
+        super().__init__(x, y, radius, (255, 255, 255))
         self.theta = theta
-        self.radius = radius
         self.v = 8
 
     def move(self) -> None:
@@ -56,23 +72,11 @@ class Projectile(object):
         self.x += int(r_x)
         self.y += int(r_y)
 
-    def draw(self, win, player: Player, mid_x, mid_y):
-        a_x = self.x - player.x
-        a_y = self.y - player.y
-        pygame.draw.circle(win, (255, 255, 255), (mid_x + a_x, mid_y + a_y), self.radius)
 
-    def is_offscreen(self, player: Player, width: int, height: int) -> bool:
-        a_x = self.x - player.x
-        a_y = self.y - player.y
-        return abs(a_x) > width or abs(a_y) > height
-
-
-class Enemy(object):
+class Enemy(Entity):
 
     def __init__(self, x: int, y: int, radius: int) -> None:
-        self.x = x
-        self.y = y
-        self.radius = radius
+        super().__init__(x, y, radius, (0, 255, 0))
         self.theta = random.random() * math.pi * 2
         self.v = 3
         self.hits = 5
@@ -103,23 +107,13 @@ class Enemy(object):
     def is_dead(self) -> bool:
         return self.hits <= 0
 
-    def draw(self, win, player: Player, mid_x: int, mid_y: int) -> None:
-        a_x = self.x - player.x
-        a_y = self.y - player.y
-        pygame.draw.circle(win, (0, 255, 0), (mid_x + a_x, mid_y + a_y), self.radius)
 
-    def is_offscreen(self, player: Player, width: int, height: int) -> bool:
-        a_x = self.x - player.x
-        a_y = self.y - player.y
-        return abs(a_x) > width or abs(a_y) > height
-
-
-class Gun(object):
+class Gun(Entity):
 
     def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
-        self.x = x
-        self.y = y
+        super().__init__(x, y, 4, (255, 0, 0))
         self.theta = theta
+        self.projectile_cooldown = 5
 
     def update_position(self, width: int, height: int) -> None:
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -128,8 +122,8 @@ class Gun(object):
         self.y = r_y + height // 2
         self.theta = get_angle(mouse_x, mouse_y, width, height)
 
-    def shoot(self) -> None:
-        pass
-
-    def draw(self, win, mid_x: int, mid_y: int) -> None:
+    def draw(self, win, that: Entity, mid_x: int, mid_y: int) -> None:
         pygame.draw.line(win, (255, 0, 0), (mid_x, mid_y), (self.x, self.y), 4)
+
+    def shoot(self, x: int, y: int, w2: int, h2: int):
+        return Projectile(self.x + x - w2, self.y + y - h2, self.theta, 1)
