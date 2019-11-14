@@ -3,7 +3,6 @@ import random
 import pygame
 import os
 
-from utilities.geometry import get_angle, project
 from entity import Player, Enemy
 
 pygame.init()
@@ -36,7 +35,6 @@ def main():
 
     projectiles = []
     projectile_tick = 0
-    projectile_cooldown = 5
     run = True
 
     while run:
@@ -54,14 +52,14 @@ def main():
             if pygame.mouse.get_pressed()[0]:
                 projectiles.append(player.shoot(w2, h2))
                 projectile_tick = 1
-        elif projectile_tick < projectile_cooldown:
+        elif projectile_tick < player.gun.projectile_cooldown:
             projectile_tick += 1
         else:
             projectile_tick = 0
 
         win.fill((0, 0, 0))
         win.blit(bg, (w2 - player.x, h2 - player.y))
-        player.draw(win, w2, h2)
+        player.draw(win, player, w2, h2)
 
         for projectile in projectiles:
             projectile.draw(win, player, w2, h2)
@@ -74,6 +72,7 @@ def main():
                     enemy.hit()
                     if enemy.is_dead():
                         enemies.remove(enemy)
+                break
 
         for enemy in enemies:
             enemy.move()
