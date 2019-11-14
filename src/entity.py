@@ -27,7 +27,7 @@ class Player(Entity):
 
     def __init__(self, x: int, y: int) -> None:
         super().__init__(x, y, 10, (255, 0, 0))
-        self.gun = Gun()
+        self.gun = Pistol()
 
     def move(self, max_x: int, max_y: int, width: int, height: int) -> None:
         keys = pygame.key.get_pressed()
@@ -110,20 +110,30 @@ class Enemy(Entity):
 
 class Gun(Entity):
 
-    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.,
+                 cooldown: int = 5, length: int = 4, width: int = 20) -> None:
         super().__init__(x, y, 4, (255, 0, 0))
         self.theta = theta
-        self.projectile_cooldown = 5
+        self.cooldown = cooldown
+        self.length = length
+        self.width = width
 
     def update_position(self, width: int, height: int) -> None:
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        r_x, r_y = project(mouse_x, mouse_y, width, height, 20)
+        r_x, r_y = project(mouse_x, mouse_y, width, height, self.length)
         self.x = r_x + width // 2
         self.y = r_y + height // 2
         self.theta = get_angle(mouse_x, mouse_y, width, height)
 
     def draw(self, win, that: Entity, mid_x: int, mid_y: int) -> None:
-        pygame.draw.line(win, (255, 0, 0), (mid_x, mid_y), (self.x, self.y), 4)
+        pygame.draw.line(win, self.colour, (mid_x, mid_y), (self.x, self.y), self.width)
 
-    def shoot(self, x: int, y: int, w2: int, h2: int):
+    def shoot(self, x: int, y: int, w2: int, h2: int) -> Projectile:
         return Projectile(self.x + x - w2, self.y + y - h2, self.theta, 1)
+
+
+class Pistol(Gun):
+
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
+        super().__init__(x, y, theta, 5, 20, 4)
+

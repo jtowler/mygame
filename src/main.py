@@ -52,7 +52,7 @@ def main():
             if pygame.mouse.get_pressed()[0]:
                 projectiles.append(player.shoot(w2, h2))
                 projectile_tick = 1
-        elif projectile_tick < player.gun.projectile_cooldown:
+        elif projectile_tick < player.gun.cooldown:
             projectile_tick += 1
         else:
             projectile_tick = 0
