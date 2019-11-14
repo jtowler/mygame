@@ -1,6 +1,6 @@
 import random
 import pygame
-from typing import Tuple
+from typing import Tuple, List
 
 from utilities.geometry import *
 
@@ -27,7 +27,7 @@ class Player(Entity):
 
     def __init__(self, x: int, y: int) -> None:
         super().__init__(x, y, 10, (255, 0, 0))
-        self.gun = Gun()
+        self.gun = Pistol()
 
     def move(self, max_x: int, max_y: int, width: int, height: int) -> None:
         keys = pygame.key.get_pressed()
@@ -42,6 +42,14 @@ class Player(Entity):
             vert -= 5
         if keys[pygame.K_s] and self.y < max_y:
             vert += 5
+        if keys[pygame.K_1]:
+            self.gun = Pistol()
+        if keys[pygame.K_2]:
+            self.gun = Shotgun()
+        if keys[pygame.K_3]:
+            self.gun = Uzi()
+        if keys[pygame.K_4]:
+            self.gun = Bazooka()
 
         if hori and vert:
             hori = int(hori / math.sqrt(2))
@@ -56,16 +64,17 @@ class Player(Entity):
         super().draw(win, this, mid_x, mid_y)
         self.gun.draw(win, this, mid_x, mid_y)
 
-    def shoot(self, w2: int, h2: int):
+    def shoot(self, w2: int, h2: int) -> List['Projectile']:
         return self.gun.shoot(self.x, self.y, w2, h2)
 
 
 class Projectile(Entity):
 
-    def __init__(self, x: int, y: int, theta: float, radius: int) -> None:
+    def __init__(self, x: int, y: int, theta: float, radius: int, v: int, damage: int) -> None:
         super().__init__(x, y, radius, (255, 255, 255))
         self.theta = theta
-        self.v = 8
+        self.v = v
+        self.damage = damage
 
     def move(self) -> None:
         r_x, r_y = get_projections(self.v, self.theta)
@@ -101,8 +110,8 @@ class Enemy(Entity):
         rad_sum_sq = (self.radius + projectile.radius) * (self.radius + projectile.radius)
         return dist_sq < rad_sum_sq
 
-    def hit(self) -> None:
-        self.hits -= 1
+    def hit(self, projectile: Projectile) -> None:
+        self.hits -= projectile.damage
 
     def is_dead(self) -> bool:
         return self.hits <= 0
@@ -110,20 +119,63 @@ class Enemy(Entity):
 
 class Gun(Entity):
 
-    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0., cooldown: int = 5, length: int = 20,
+                 width: int = 4, proj_width: int = 1, proj_v: int = 8, proj_damage: int = 1) -> None:
         super().__init__(x, y, 4, (255, 0, 0))
         self.theta = theta
-        self.projectile_cooldown = 5
+        self.cooldown = cooldown
+        self.length = length
+        self.width = width
+        self.proj_width = proj_width
+        self.proj_v = proj_v
+        self.proj_damage = proj_damage
 
     def update_position(self, width: int, height: int) -> None:
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        r_x, r_y = project(mouse_x, mouse_y, width, height, 20)
+        r_x, r_y = project(mouse_x, mouse_y, width, height, self.length)
         self.x = r_x + width // 2
         self.y = r_y + height // 2
         self.theta = get_angle(mouse_x, mouse_y, width, height)
 
     def draw(self, win, that: Entity, mid_x: int, mid_y: int) -> None:
-        pygame.draw.line(win, (255, 0, 0), (mid_x, mid_y), (self.x, self.y), 4)
+        pygame.draw.line(win, self.colour, (mid_x, mid_y), (self.x, self.y), self.width)
 
-    def shoot(self, x: int, y: int, w2: int, h2: int):
-        return Projectile(self.x + x - w2, self.y + y - h2, self.theta, 1)
+    def shoot(self, x: int, y: int, w2: int, h2: int) -> List[Projectile]:
+        return [
+            Projectile(self.x + x - w2, self.y + y - h2, self.theta, self.proj_width, self.proj_v, self.proj_damage)
+        ]
+
+
+class Pistol(Gun):
+
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
+        super().__init__(x, y, theta)
+
+
+class Shotgun(Gun):
+
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
+        self.pellets = 6
+        super().__init__(x, y, theta, length=22, width=8, cooldown=10)
+
+    def shoot(self, x: int, y: int, w2: int, h2: int) -> List[Projectile]:
+        projectiles = []
+        for _ in range(self.pellets):
+            angle = self.theta + random.random() * 0.4 - 0.2
+            print(angle)
+            projectiles.append(
+                Projectile(self.x + x - w2, self.y + y - h2, angle, self.proj_width, self.proj_v, self.proj_damage)
+            )
+        return projectiles
+
+
+class Uzi(Gun):
+
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
+        super().__init__(x, y, theta, length=15, width=6, cooldown=3)
+
+
+class Bazooka(Gun):
+
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
+        super().__init__(x, y, theta, 20, 30, 8, 4, 6, 5)
