@@ -69,7 +69,7 @@ def main():
             for enemy in enemies:
                 if enemy.is_hit(projectile):
                     projectiles.remove(projectile)
-                    enemy.hit()
+                    enemy.hit(projectile)
                     if enemy.is_dead():
                         enemies.remove(enemy)
                 break

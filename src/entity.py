@@ -27,7 +27,7 @@ class Player(Entity):
 
     def __init__(self, x: int, y: int) -> None:
         super().__init__(x, y, 10, (255, 0, 0))
-        self.gun = Pistol()
+        self.gun = Bazooka()
 
     def move(self, max_x: int, max_y: int, width: int, height: int) -> None:
         keys = pygame.key.get_pressed()
@@ -62,10 +62,11 @@ class Player(Entity):
 
 class Projectile(Entity):
 
-    def __init__(self, x: int, y: int, theta: float, radius: int) -> None:
+    def __init__(self, x: int, y: int, theta: float, radius: int, v: int, damage: int) -> None:
         super().__init__(x, y, radius, (255, 255, 255))
         self.theta = theta
-        self.v = 8
+        self.v = v
+        self.damage = damage
 
     def move(self) -> None:
         r_x, r_y = get_projections(self.v, self.theta)
@@ -101,8 +102,8 @@ class Enemy(Entity):
         rad_sum_sq = (self.radius + projectile.radius) * (self.radius + projectile.radius)
         return dist_sq < rad_sum_sq
 
-    def hit(self) -> None:
-        self.hits -= 1
+    def hit(self, projectile: Projectile) -> None:
+        self.hits -= projectile.damage
 
     def is_dead(self) -> bool:
         return self.hits <= 0
@@ -110,13 +111,16 @@ class Enemy(Entity):
 
 class Gun(Entity):
 
-    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.,
-                 cooldown: int = 5, length: int = 4, width: int = 20) -> None:
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0., cooldown: int = 5, length: int = 20,
+                 width: int = 4, proj_width: int = 1, proj_v: int = 8, proj_damage: int = 1) -> None:
         super().__init__(x, y, 4, (255, 0, 0))
         self.theta = theta
         self.cooldown = cooldown
         self.length = length
         self.width = width
+        self.proj_width = proj_width
+        self.proj_v = proj_v
+        self.proj_damage = proj_damage
 
     def update_position(self, width: int, height: int) -> None:
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -129,11 +133,16 @@ class Gun(Entity):
         pygame.draw.line(win, self.colour, (mid_x, mid_y), (self.x, self.y), self.width)
 
     def shoot(self, x: int, y: int, w2: int, h2: int) -> Projectile:
-        return Projectile(self.x + x - w2, self.y + y - h2, self.theta, 1)
+        return Projectile(self.x + x - w2, self.y + y - h2, self.theta, self.proj_width, self.proj_v, self.proj_damage)
 
 
 class Pistol(Gun):
 
     def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
-        super().__init__(x, y, theta, 5, 20, 4)
+        super().__init__(x, y, theta)
 
+
+class Bazooka(Gun):
+
+    def __init__(self, x: int = 0, y: int = 0, theta: float = 0.) -> None:
+        super().__init__(x, y, theta, 20, 30, 8, 4, 6, 5)
