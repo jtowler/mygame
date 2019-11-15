@@ -74,8 +74,9 @@ def main():
                     break
 
         for enemy in enemies:
-            enemy.move(bg_x, bg_y)
-            enemy.draw(win, player, w2, h2)
+            if not enemy.is_offscreen(player, width, height):
+                enemy.move(bg_x, bg_y)
+                enemy.draw(win, player, w2, h2)
 
         pygame.display.update()
 
