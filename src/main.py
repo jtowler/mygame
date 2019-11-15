@@ -31,7 +31,7 @@ def main():
 
     player = Player(bg_x // 2, bg_y // 2)
 
-    enemies = [Enemy(random.randrange(0, width), random.randrange(0, height), 10)]
+    enemies = [Enemy(random.randrange(0, bg_x), random.randrange(0, bg_y), 10) for _ in range(10)]
 
     projectiles = []
     projectile_tick = 0
@@ -71,10 +71,10 @@ def main():
                     enemy.hit(projectile)
                     if enemy.is_dead():
                         enemies.remove(enemy)
-                break
+                    break
 
         for enemy in enemies:
-            enemy.move()
+            enemy.move(bg_x, bg_y)
             enemy.draw(win, player, w2, h2)
 
         pygame.display.update()

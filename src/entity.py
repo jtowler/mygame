@@ -90,7 +90,7 @@ class Enemy(Entity):
         self.v = 3
         self.hits = 5
 
-    def move(self) -> None:
+    def move(self, max_x, max_y) -> None:
         r = random.random()
         if r < 0.2:
             self.theta += 1
@@ -102,8 +102,10 @@ class Enemy(Entity):
                 self.theta = self.theta + 2 * math.pi
 
         r_x, r_y = get_projections(self.v, self.theta)
-        self.x += int(r_x)
-        self.y += int(r_y)
+        if 0 < self.x + int(r_x) < max_x:
+            self.x += int(r_x)
+        if 0 < self.y + int(r_y) < max_y:
+            self.y += int(r_y)
 
     def is_hit(self, projectile: Projectile) -> bool:
         dist_sq = (self.x - projectile.x) * (self.x - projectile.x) + (self.y - projectile.y) * (self.y - projectile.y)
@@ -162,7 +164,6 @@ class Shotgun(Gun):
         projectiles = []
         for _ in range(self.pellets):
             angle = self.theta + random.random() * 0.4 - 0.2
-            print(angle)
             projectiles.append(
                 Projectile(self.x + x - w2, self.y + y - h2, angle, self.proj_width, self.proj_v, self.proj_damage)
             )
