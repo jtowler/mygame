@@ -3,7 +3,7 @@ import random
 import pygame
 import os
 
-from entity import Player, Enemy
+from entity import Player, Minion, Tank, Runner
 
 pygame.init()
 
@@ -21,7 +21,6 @@ clock = pygame.time.Clock()
 win = pygame.display.set_mode((width, height))
 pygame.display.set_caption('MyGame')
 
-
 bg = load('test_bg.png').convert()
 
 
@@ -31,7 +30,9 @@ def main():
 
     player = Player(bg_x // 2, bg_y // 2)
 
-    enemies = [Enemy(random.randrange(0, bg_x), random.randrange(0, bg_y), 10) for _ in range(10)]
+    enemies = [Minion(random.randrange(0, bg_x), random.randrange(0, bg_y)) for _ in range(10)] + \
+              [Runner(random.randrange(0, bg_x), random.randrange(0, bg_y)) for _ in range(3)] + \
+              [Tank(random.randrange(0, bg_x), random.randrange(0, bg_y))]
 
     projectiles = []
     projectile_tick = 0
@@ -75,7 +76,7 @@ def main():
 
         for enemy in enemies:
             if not enemy.is_offscreen(player, width, height):
-                enemy.move(bg_x, bg_y)
+                enemy.move(bg_x, bg_y, player)
                 enemy.draw(win, player, w2, h2)
 
         pygame.display.update()
