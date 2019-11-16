@@ -3,7 +3,7 @@ import random
 import pygame
 import os
 
-from entity import Player, Minion, Tank
+from entity import Player, Minion, Tank, Runner
 
 pygame.init()
 
@@ -21,7 +21,6 @@ clock = pygame.time.Clock()
 win = pygame.display.set_mode((width, height))
 pygame.display.set_caption('MyGame')
 
-
 bg = load('test_bg.png').convert()
 
 
@@ -32,6 +31,7 @@ def main():
     player = Player(bg_x // 2, bg_y // 2)
 
     enemies = [Minion(random.randrange(0, bg_x), random.randrange(0, bg_y)) for _ in range(10)] + \
+              [Runner(random.randrange(0, bg_x), random.randrange(0, bg_y)) for _ in range(3)] + \
               [Tank(random.randrange(0, bg_x), random.randrange(0, bg_y))]
 
     projectiles = []

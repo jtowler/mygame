@@ -27,6 +27,7 @@ class Player(Entity):
 
     def __init__(self, x: int, y: int) -> None:
         super().__init__(x, y, 10, (255, 0, 0))
+        self.v = 6
         self.gun = Pistol()
 
     def move(self, max_x: int, max_y: int, width: int, height: int) -> None:
@@ -35,13 +36,13 @@ class Player(Entity):
         hori = 0
         vert = 0
         if keys[pygame.K_a] and self.x > 0:
-            hori -= 5
+            hori -= self.v
         if keys[pygame.K_d] and self.x < max_x:
-            hori += 5
+            hori += self.v
         if keys[pygame.K_w] and self.y > 0:
-            vert -= 5
+            vert -= self.v
         if keys[pygame.K_s] and self.y < max_y:
-            vert += 5
+            vert += self.v
         if keys[pygame.K_1]:
             self.gun = Pistol()
         if keys[pygame.K_2]:
@@ -105,7 +106,7 @@ class Enemy(Entity):
 
 class Minion(Enemy):
     def __init__(self, x: int, y: int) -> None:
-        super().__init__(x, y, 10, (0, 255, 0), 5, 5)
+        super().__init__(x, y, 10, (0, 255, 0), 4, 5)
         self.theta = random.random() * math.pi * 2
 
     def move(self, max_x, max_y, player: Player) -> None:
@@ -138,6 +139,20 @@ class Tank(Enemy):
             self.x -= int(r_x)
         if 0 < self.y + int(r_y) < max_y:
             self.y -= int(r_y)
+
+
+class Runner(Enemy):
+    def __init__(self, x: int, y: int) -> None:
+        super().__init__(x, y, 10, (0, 255, 255), 5, 3)
+
+    def move(self, max_x: int, max_y: int, player: Player) -> None:
+
+        theta = math.atan2(self.y - player.y, self.x - player.x)
+        r_x, r_y = get_projections(self.v, theta)
+        if 0 < self.x + int(r_x) < max_x:
+            self.x += int(r_x)
+        if 0 < self.y + int(r_y) < max_y:
+            self.y += int(r_y)
 
 
 class Gun(Entity):
