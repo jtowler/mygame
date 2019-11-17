@@ -3,7 +3,8 @@ import random
 import pygame
 import os
 
-from entity import Player, Minion, Tank, Runner
+from entity import Player
+from enemy import Minion, Tank, Runner
 
 pygame.init()
 
