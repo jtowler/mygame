@@ -29,6 +29,8 @@ def main():
     bg_x = bg.get_width()
     bg_y = bg.get_height()
 
+    font = pygame.font.SysFont('helvetica', 20)
+
     player = Player(bg_x // 2, bg_y // 2)
 
     enemies = [Minion(random.randrange(0, bg_x), random.randrange(0, bg_y)) for _ in range(10)] + \
@@ -37,6 +39,7 @@ def main():
 
     projectiles = []
     projectile_tick = 0
+    score = 0
     run = True
 
     while run:
@@ -72,6 +75,7 @@ def main():
                     projectiles.remove(projectile)
                     enemy.hit(projectile)
                     if enemy.is_dead():
+                        score += enemy.points
                         enemies.remove(enemy)
                     break
 
@@ -79,6 +83,9 @@ def main():
             if not enemy.is_offscreen(player, width, height):
                 enemy.move(bg_x, bg_y, player)
                 enemy.draw(win, player, w2, h2)
+
+        text = font.render(f'Score: {score}', True, (255, 255, 255))
+        win.blit(text, (0, 0))
 
         pygame.display.update()
 

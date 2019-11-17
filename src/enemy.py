@@ -3,17 +3,20 @@ import math
 from typing import Tuple
 
 from utilities.geometry import get_projections
+
 from entity import Entity, Projectile, Player
 
 
 class Enemy(Entity):
 
-    def __init__(self, x: int, y: int, radius: int, colour: Tuple[int, int, int], v: float, hits: 5) -> None:
+    def __init__(self, x: int, y: int, radius: int, colour: Tuple[int, int, int], v: float, hits: float,
+                 points: float) -> None:
         super().__init__(x, y, radius, (0, 255, 0))
         self.theta = random.random() * math.pi * 2
         self.v = v
         self.hits = hits
         self.colour = colour
+        self.points = points
 
     def is_hit(self, projectile: Projectile) -> bool:
         dist_sq = (self.x - projectile.x) * (self.x - projectile.x) + (self.y - projectile.y) * (self.y - projectile.y)
@@ -29,7 +32,7 @@ class Enemy(Entity):
 
 class Minion(Enemy):
     def __init__(self, x: int, y: int) -> None:
-        super().__init__(x, y, 10, (0, 255, 0), 4, 5)
+        super().__init__(x, y, 10, (0, 255, 0), 4, 5, 1)
         self.theta = random.random() * math.pi * 2
 
     def move(self, max_x, max_y, player: Player) -> None:
@@ -52,7 +55,7 @@ class Minion(Enemy):
 
 class Tank(Enemy):
     def __init__(self, x: int, y: int) -> None:
-        super().__init__(x, y, 10, (0, 0, 255), 3, 15)
+        super().__init__(x, y, 10, (0, 0, 255), 3, 15, 5)
 
     def move(self, max_x: int, max_y: int, player: Player) -> None:
 
@@ -66,7 +69,7 @@ class Tank(Enemy):
 
 class Runner(Enemy):
     def __init__(self, x: int, y: int) -> None:
-        super().__init__(x, y, 10, (0, 255, 255), 5, 3)
+        super().__init__(x, y, 10, (0, 255, 255), 5, 3, 2)
 
     def move(self, max_x: int, max_y: int, player: Player) -> None:
 
