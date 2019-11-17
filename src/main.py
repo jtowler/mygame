@@ -81,6 +81,11 @@ def main():
 
         for enemy in enemies:
             if not enemy.is_offscreen(player, width, height):
+                if player.is_hit(enemy):
+                    player.curr_health -= 1
+                    if player.curr_health == 0:
+                        run = False
+                        pygame.quit()
                 enemy.move(bg_x, bg_y, player)
                 enemy.draw(win, player, w2, h2)
 

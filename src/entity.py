@@ -22,6 +22,11 @@ class Entity(object):
         a_y = self.y - entity.y
         return abs(a_x) > width or abs(a_y) > height
 
+    def is_hit(self, that: 'Entity') -> bool:
+        dist_sq = (self.x - that.x) * (self.x - that.x) + (self.y - that.y) * (self.y - that.y)
+        rad_sum_sq = (self.radius + that.radius) * (self.radius + that.radius)
+        return dist_sq < rad_sum_sq
+
 
 class Player(Entity):
 
@@ -29,6 +34,8 @@ class Player(Entity):
         super().__init__(x, y, 10, (255, 0, 0))
         self.v = 6
         self.gun = Pistol()
+        self.max_health = 10
+        self.curr_health = 10
 
     def move(self, max_x: int, max_y: int, width: int, height: int) -> None:
         keys = pygame.key.get_pressed()
@@ -81,8 +88,6 @@ class Projectile(Entity):
         r_x, r_y = get_projections(self.v, self.theta)
         self.x += int(r_x)
         self.y += int(r_y)
-
-
 
 
 class Gun(Entity):

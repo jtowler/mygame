@@ -18,11 +18,6 @@ class Enemy(Entity):
         self.colour = colour
         self.points = points
 
-    def is_hit(self, projectile: Projectile) -> bool:
-        dist_sq = (self.x - projectile.x) * (self.x - projectile.x) + (self.y - projectile.y) * (self.y - projectile.y)
-        rad_sum_sq = (self.radius + projectile.radius) * (self.radius + projectile.radius)
-        return dist_sq < rad_sum_sq
-
     def hit(self, projectile: Projectile) -> None:
         self.hits -= projectile.damage
 
