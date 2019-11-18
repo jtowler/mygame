@@ -81,7 +81,8 @@ def main():
 
         for enemy in enemies:
             if not enemy.is_offscreen(player, width, height):
-                if player.is_hit(enemy):
+                if player.is_hit(enemy) and not player.was_hit:
+                    player.was_hit = True
                     player.curr_health -= 1
                     if player.curr_health == 0:
                         run = False

@@ -36,6 +36,8 @@ class Player(Entity):
         self.gun = Pistol()
         self.max_health = 10
         self.curr_health = 10
+        self.was_hit = False
+        self.was_hit_count = 0
 
     def move(self, max_x: int, max_y: int, width: int, height: int) -> None:
         keys = pygame.key.get_pressed()
@@ -67,6 +69,13 @@ class Player(Entity):
         self.y += vert
 
         self.gun.update_position(width, height)
+
+        if self.was_hit:
+            if self.was_hit_count == 10:
+                self.was_hit_count = 0
+                self.was_hit = False
+            else:
+                self.was_hit_count += 1
 
     def draw(self, win, this, mid_x, mid_y) -> None:
         super().draw(win, this, mid_x, mid_y)
